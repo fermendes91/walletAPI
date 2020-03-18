@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Optional;
 
 import org.junit.Before;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
