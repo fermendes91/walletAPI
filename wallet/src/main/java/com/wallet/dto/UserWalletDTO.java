@@ -8,10 +8,8 @@ import lombok.Data;
 public class UserWalletDTO {
 
 	private Long id;
-	
-	@NotNull(message = "Informe o id do usuario")
-	private Long user;
-	
+	@NotNull(message = "Informe o id do usuário")
+	private Long users;
 	@NotNull(message = "Informe o id da carteira")
 	private Long wallet;
 }

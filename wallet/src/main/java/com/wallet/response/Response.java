@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Response<T> {
-	
+
 	private T data;
 	private List<String> errors;
 	
@@ -19,7 +19,6 @@ public class Response<T> {
 		if (this.errors == null) {
 			this.errors = new ArrayList<String>();
 		}
-		return this.errors;
+		return errors;
 	}
-	
 }

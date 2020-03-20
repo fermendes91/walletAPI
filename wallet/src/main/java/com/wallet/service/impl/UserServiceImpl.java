@@ -13,16 +13,18 @@ import com.wallet.service.UserService;
 public class UserServiceImpl implements UserService{
 
 	@Autowired
-	UserRepository userRepository;
+	UserRepository repository;
 	
 	@Override
 	public User save(User u) {
-		return userRepository.save(u);
+		// TODO Auto-generated method stub
+		return repository.save(u);
 	}
 
 	@Override
-	public Optional<User> findByEmailEquals(String email) {
-		return userRepository.findByEmailEquals(email);
+	public Optional<User> findByEmail(String email) {
+		// TODO Auto-generated method stub
+		return repository.findByEmailEquals(email);
 	}
 
 }

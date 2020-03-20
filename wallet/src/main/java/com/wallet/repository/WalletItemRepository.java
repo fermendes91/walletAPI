@@ -13,7 +13,7 @@ import org.springframework.data.repository.query.Param;
 import com.wallet.entity.WalletItem;
 import com.wallet.util.enums.TypeEnum;
 
-public interface WalletItemRepository extends JpaRepository<WalletItem, Long>{
+public interface WalletItemRepository extends JpaRepository<WalletItem, Long> {
 
 	Page<WalletItem> findAllByWalletIdAndDateGreaterThanEqualAndDateLessThanEqual(Long wallet, Date init, Date end, Pageable page);
 	
@@ -21,5 +21,4 @@ public interface WalletItemRepository extends JpaRepository<WalletItem, Long>{
 	
 	@Query(value = "select sum(value) from WalletItem wi where wi.wallet.id = :wallet")
 	BigDecimal sumByWalletId(@Param("wallet") Long wallet);
-	
 }

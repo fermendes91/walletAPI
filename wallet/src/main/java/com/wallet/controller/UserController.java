@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,13 +16,14 @@ import com.wallet.entity.User;
 import com.wallet.response.Response;
 import com.wallet.service.UserService;
 import com.wallet.util.BCrypt;
+import com.wallet.util.enums.RoleEnum;
 
 @RestController
 @RequestMapping("user")
 public class UserController {
 
 	@Autowired
-	private UserService userService;
+	private UserService service;
 	
 	@PostMapping
 	public ResponseEntity<Response<UserDTO>> create(@Valid @RequestBody UserDTO dto, BindingResult result) {
@@ -31,39 +31,35 @@ public class UserController {
 		Response<UserDTO> response = new Response<UserDTO>();
 		
 		if (result.hasErrors()) {
-			result.getAllErrors().forEach(error -> {
-				response.getErrors().add(error.getDefaultMessage());
-			});
+			result.getAllErrors().forEach(e -> response.getErrors().add(e.getDefaultMessage()));
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 		
-		User user = userService.save(this.convertDtoToEntity(dto));
+		User user = service.save(this.convertDtoToEntity(dto));
 		
-		response.setData(this.convertEntityToDTO(user));
-	
+		response.setData(this.convertEntityToDto(user));
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	
 	private User convertDtoToEntity(UserDTO dto) {
 		User u = new User();
-		
 		u.setId(dto.getId());
 		u.setEmail(dto.getEmail());
 		u.setName(dto.getName());
 		u.setPassword(BCrypt.getHash(dto.getPassword()));
+		u.setRole(RoleEnum.valueOf(dto.getRole()));
 		
 		return u;
 	}
 	
-	private UserDTO convertEntityToDTO(User u) {
+	private UserDTO convertEntityToDto(User u) {
 		UserDTO dto = new UserDTO();
-		
 		dto.setId(u.getId());
 		dto.setEmail(u.getEmail());
 		dto.setName(u.getName());
+		dto.setRole(u.getRole().toString());
 		
 		return dto;
-		
-		
 	}
 }

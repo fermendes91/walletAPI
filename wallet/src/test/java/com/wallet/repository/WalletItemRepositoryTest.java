@@ -1,8 +1,8 @@
 package com.wallet.repository;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -35,15 +35,13 @@ public class WalletItemRepositoryTest {
 	
 	private static final Date DATE = new Date();
 	private static final TypeEnum TYPE = TypeEnum.EN;
-	private static final String DESCRIPTION = "Conta de luz";
+	private static final String DESCRIPTION = "Conta de Luz";
 	private static final BigDecimal VALUE = BigDecimal.valueOf(65);
-	
 	private Long savedWalletItemId = null;
 	private Long savedWalletId = null;
 	
 	@Autowired
-	WalletItemRepository walletItemRepository;
-	
+	WalletItemRepository repository;
 	@Autowired
 	WalletRepository walletRepository;
 	
@@ -55,23 +53,16 @@ public class WalletItemRepositoryTest {
 		walletRepository.save(w);
 		
 		WalletItem wi = new WalletItem(null, w, DATE, TYPE, DESCRIPTION, VALUE);
-		walletItemRepository.save(wi);
+		repository.save(wi);
 		
 		savedWalletItemId = wi.getId();
 		savedWalletId = w.getId();
-		
 	}
 	
 	@After
 	public void tearDown() {
-		walletItemRepository.deleteAll();
+		repository.deleteAll();
 		walletRepository.deleteAll();
-	}
-	
-	@Test(expected = ConstraintViolationException.class)
-	public void testSaveInvalidWalletItem() {
-		WalletItem wi = new WalletItem(null, null, DATE, null, DESCRIPTION, null);
-		walletItemRepository.save(wi);
 	}
 	
 	@Test
@@ -84,30 +75,36 @@ public class WalletItemRepositoryTest {
 		
 		WalletItem wi = new WalletItem(1L, w, DATE, TYPE, DESCRIPTION, VALUE);
 		
-		WalletItem response = walletItemRepository.save(wi);
+		WalletItem response = repository.save(wi);
 		
 		assertNotNull(response);
 		assertEquals(response.getDescription(), DESCRIPTION);
 		assertEquals(response.getType(), TYPE);
 		assertEquals(response.getValue(), VALUE);
 		assertEquals(response.getWallet().getId(), w.getId());
+		
+	}
+	
+	@Test(expected = ConstraintViolationException.class)
+	public void testSaveInvalidWalletItem() {
+		WalletItem wi = new WalletItem(null, null, DATE, null, DESCRIPTION, null);
+		repository.save(wi);
 	}
 	
 	@Test
 	public void testUpdate() {
-		Optional<WalletItem> wi = walletItemRepository.findById(savedWalletItemId);
+		Optional<WalletItem> wi = repository.findById(savedWalletItemId);
 		
 		String description = "Descrição alterada";
 		
 		WalletItem changed = wi.get();
 		changed.setDescription(description);
 		
-		walletItemRepository.save(changed);
+		repository.save(changed);
 		
-		Optional<WalletItem> newWalletItem = walletItemRepository.findById(savedWalletItemId);
+		Optional<WalletItem> newWalletItem = repository.findById(savedWalletItemId);
 		
 		assertEquals(description, newWalletItem.get().getDescription());
-		
 	}
 	
 	@Test
@@ -115,11 +112,11 @@ public class WalletItemRepositoryTest {
 		Optional<Wallet> wallet = walletRepository.findById(savedWalletId);
 		WalletItem wi = new WalletItem(null, wallet.get(), DATE, TYPE, DESCRIPTION, VALUE);
 		
-		walletItemRepository.save(wi);
+		repository.save(wi);
 		
-		walletItemRepository.deleteById(wi.getId());
+		repository.deleteById(wi.getId());
 		
-		Optional<WalletItem> response = walletItemRepository.findById(wi.getId());
+		Optional<WalletItem> response = repository.findById(wi.getId());
 		
 		assertFalse(response.isPresent());
 	}
@@ -134,11 +131,11 @@ public class WalletItemRepositoryTest {
 		Date currentDatePlusSevenDays = Date.from(localDateTime.plusDays(7).atZone(ZoneId.systemDefault()).toInstant());
 
         
-		walletItemRepository.save(new WalletItem(null, w.get(), currentDatePlusFiveDays, TYPE, DESCRIPTION, VALUE));
-		walletItemRepository.save(new WalletItem(null, w.get(), currentDatePlusSevenDays, TYPE, DESCRIPTION, VALUE));
+		repository.save(new WalletItem(null, w.get(), currentDatePlusFiveDays, TYPE, DESCRIPTION, VALUE));
+		repository.save(new WalletItem(null, w.get(), currentDatePlusSevenDays, TYPE, DESCRIPTION, VALUE));
 		
 		PageRequest pg = PageRequest.of(0, 10);
-		Page<WalletItem> response = walletItemRepository.findAllByWalletIdAndDateGreaterThanEqualAndDateLessThanEqual(savedWalletId, DATE, currentDatePlusFiveDays, pg);
+		Page<WalletItem> response = repository.findAllByWalletIdAndDateGreaterThanEqualAndDateLessThanEqual(savedWalletId, DATE, currentDatePlusFiveDays, pg);
 		
 		assertEquals(response.getContent().size(), 2);
 		assertEquals(response.getTotalElements(), 2);
@@ -147,7 +144,7 @@ public class WalletItemRepositoryTest {
 	
 	@Test
 	public void testFindByType() {
-		List<WalletItem> response = walletItemRepository.findByWalletIdAndType(savedWalletId, TYPE);
+		List<WalletItem> response = repository.findByWalletIdAndType(savedWalletId, TYPE);
 		
 		assertEquals(response.size(), 1);
 		assertEquals(response.get(0).getType(), TYPE);
@@ -158,9 +155,9 @@ public class WalletItemRepositoryTest {
 		
 		Optional<Wallet> w = walletRepository.findById(savedWalletId);
 		
-		walletItemRepository.save(new WalletItem(null, w.get(), DATE, TypeEnum.SD, DESCRIPTION, VALUE));
+		repository.save(new WalletItem(null, w.get(), DATE, TypeEnum.SD, DESCRIPTION, VALUE));
 		
-		List<WalletItem> response = walletItemRepository.findByWalletIdAndType(savedWalletId, TypeEnum.SD);
+		List<WalletItem> response = repository.findByWalletIdAndType(savedWalletId, TypeEnum.SD);
 		
 		assertEquals(response.size(), 1);
 		assertEquals(response.get(0).getType(), TypeEnum.SD);
@@ -170,11 +167,10 @@ public class WalletItemRepositoryTest {
 	public void testSumByWallet() {
 		Optional<Wallet> w = walletRepository.findById(savedWalletId);
 		
-		walletItemRepository.save(new WalletItem(null, w.get(), DATE, TYPE, DESCRIPTION, BigDecimal.valueOf(150.80)));
+		repository.save(new WalletItem(null, w.get(), DATE, TYPE, DESCRIPTION, BigDecimal.valueOf(150.80)));
 		
-		BigDecimal response = walletItemRepository.sumByWalletId(savedWalletId);
+		BigDecimal response = repository.sumByWalletId(savedWalletId);
 		
 		assertEquals(response.compareTo(BigDecimal.valueOf(215.8)), 0);
 	}
-	
 }

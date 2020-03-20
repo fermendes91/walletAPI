@@ -24,24 +24,20 @@ import com.wallet.repository.UserRepository;
 public class UserServiceTest {
 
 	@MockBean
-	UserRepository userRepository;
+	UserRepository repository;
 	
 	@Autowired
-	UserService userService;
+	UserService service;
 	
 	@Before
 	public void setUp() {
-		
-		BDDMockito.given(userRepository.findByEmailEquals(Mockito.anyString())).willReturn(Optional.of(new User()));
-	
-		// when(userRepository.findByEmailEquals(anyString())).thenReturn(Optional.of(new User()));
+		BDDMockito.given(repository.findByEmailEquals(Mockito.anyString())).willReturn(Optional.of(new User()));
 	}
 	
 	@Test
 	public void testFindByEmail() {
-		Optional<User> user = userService.findByEmailEquals("email@teste.com");
+		Optional<User> user = service.findByEmail("email@teste.com");
 		
 		assertTrue(user.isPresent());
 	}
-	
 }

@@ -15,17 +15,17 @@ import lombok.Data;
 @Data
 public class Wallet implements Serializable{
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = -6079769300175684582L;
-
-	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
-	private Long id;
 	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	@NotNull
 	private String name;
-	
 	@NotNull
 	private BigDecimal value;
-	
 
 }

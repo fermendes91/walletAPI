@@ -19,11 +19,11 @@ import com.wallet.response.Response;
 import com.wallet.service.UserWalletService;
 
 @RestController
-@RequestMapping("user-wallet")
+@RequestMapping(path = "user-wallet")
 public class UserWalletController {
-
+	
 	@Autowired
-	private UserWalletService userWalletService;
+	private UserWalletService service;
 	
 	@PostMapping
 	public ResponseEntity<Response<UserWalletDTO>> create(@Valid @RequestBody UserWalletDTO dto, BindingResult result) {
@@ -31,46 +31,38 @@ public class UserWalletController {
 		Response<UserWalletDTO> response = new Response<UserWalletDTO>();
 		
 		if (result.hasErrors()) {
-			result.getAllErrors().forEach(error -> {
-				response.getErrors().add(error.getDefaultMessage());
-			});
+			result.getAllErrors().forEach(r -> response.getErrors().add(r.getDefaultMessage()));
+			
 			return ResponseEntity.badRequest().body(response);
 		}
 		
-		UserWallet uw = userWalletService.save(this.convertDtoToEntity(dto));
+		UserWallet uw = service.save(this.convertDtoToEntity(dto));
 		
 		response.setData(this.convertEntityToDto(uw));
-		
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
-		
 	}
 	
 	public UserWallet convertDtoToEntity(UserWalletDTO dto) {
-		
 		UserWallet uw = new UserWallet();
-		
 		User u = new User();
-		u.setId(dto.getUser());
-		
+		u.setId(dto.getUsers());
 		Wallet w = new Wallet();
 		w.setId(dto.getWallet());
 		
 		uw.setId(dto.getId());
-		uw.setUser(u);
+		uw.setUsers(u);
 		uw.setWallet(w);
 		
 		return uw;
 	}
 	
 	public UserWalletDTO convertEntityToDto(UserWallet uw) {
-		
 		UserWalletDTO dto = new UserWalletDTO();
-		
 		dto.setId(uw.getId());
-		dto.setUser(uw.getUser().getId());
+		dto.setUsers(uw.getUsers().getId());
 		dto.setWallet(uw.getWallet().getId());
 		
 		return dto;
 	}
-	
+
 }

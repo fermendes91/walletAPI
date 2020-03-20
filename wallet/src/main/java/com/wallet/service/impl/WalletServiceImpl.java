@@ -10,11 +10,13 @@ import com.wallet.service.WalletService;
 @Service
 public class WalletServiceImpl implements WalletService{
 
-	@Autowired WalletRepository walletRepository;
+	@Autowired
+	private WalletRepository repository;
 	
 	@Override
 	public Wallet save(Wallet w) {
-		return walletRepository.save(w);
+		// TODO Auto-generated method stub
+		return repository.save(w);
 	}
 
 }

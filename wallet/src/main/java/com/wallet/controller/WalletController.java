@@ -19,30 +19,31 @@ import com.wallet.service.WalletService;
 @RestController
 @RequestMapping("wallet")
 public class WalletController {
-
+	
 	@Autowired
-	private WalletService walletService;
+	private WalletService service;
 	
 	@PostMapping
 	public ResponseEntity<Response<WalletDTO>> create(@Valid @RequestBody WalletDTO dto, BindingResult result) {
 		
 		Response<WalletDTO> response = new Response<WalletDTO>();
-	
+		
 		if (result.hasErrors()) {
-			result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
+			result.getAllErrors().forEach(r -> response.getErrors().add(r.getDefaultMessage()));
+			
 			return ResponseEntity.badRequest().body(response);
 		}
 		
-		Wallet w = walletService.save(this.convertDtoToEntity(dto));
+		Wallet w = service.save(this.convertDtoToEntity(dto));
 		
-		response.setData(this.convertEntityToDTO(w));
+		response.setData(this.convertEntityToDto(w));
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		
 	}
 	
 	private Wallet convertDtoToEntity(WalletDTO dto) {
 		Wallet w = new Wallet();
-		
 		w.setId(dto.getId());
 		w.setName(dto.getName());
 		w.setValue(dto.getValue());
@@ -50,14 +51,13 @@ public class WalletController {
 		return w;
 	}
 	
-	private WalletDTO convertEntityToDTO(Wallet w) {
+	private WalletDTO convertEntityToDto(Wallet w) {
 		WalletDTO dto = new WalletDTO();
-		
 		dto.setId(w.getId());
 		dto.setName(w.getName());
 		dto.setValue(w.getValue());
-		
+
 		return dto;
 	}
-	
+
 }

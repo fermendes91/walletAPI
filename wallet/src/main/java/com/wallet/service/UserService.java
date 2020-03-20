@@ -6,8 +6,7 @@ import com.wallet.entity.User;
 
 public interface UserService {
 
-	User save(User U);
+	User save(User u);
 	
-	Optional<User> findByEmailEquals(String email);
-	
+	Optional<User> findByEmail(String email);
 }
